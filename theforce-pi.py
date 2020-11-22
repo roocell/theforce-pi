@@ -6,24 +6,29 @@ import ledbargraph
 import segmentdisplay
 
 def loop():
+    t=time.time()
+    bavg = [0,0,0,0,0,0,0,0,0,0]
+    bcnt = 0
     while True:
         distance = ultrasonic.getSonar() # get distance
-        print ("The distance is : %.2f cm"%(distance))
 
-        for i in range(0,len(segmentdisplay.num)):
-            segmentdisplay.display(i)
-            time.sleep(0.5)
+        # divide into 8 segments of ultrasonic range to put into bargraph
+        # detection only works reliably to like 50..70cm max
+        b = int(distance*8.0/50.0)
 
-        x=0x01
-        for i in range(0,8):
-            ledbargraph.display(x)
-            x<<=1 # make the variable move one bit to left once, then the bright LED move one step to the left once.
-            time.sleep(0.1)
-        x=0x80
-        for i in range(0,8):
-            ledbargraph.display(x)
-            x>>=1
-            time.sleep(0.1)
+        # moving average to stabilize it a bit
+        bavg[bcnt]=b
+        bcnt += 1
+        if bcnt >= len(bavg):
+            bcnt = 0
+        b = int(sum(bavg)/len(bavg))
+
+        ledbargraph.display(b)
+
+        dt = time.time() - t
+        if dt > 1:
+            t = time.time()
+            print ("The distance is : {} cm b {}".format(distance,b))
 
 def setup():
     segmentdisplay.setup()
