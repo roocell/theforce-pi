@@ -27,6 +27,11 @@ def shiftOut(dPin,cPin,order,val):
             GPIO.output(dPin,(0x80&(val<<i)==0x80) and GPIO.HIGH or GPIO.LOW)
         GPIO.output(cPin,GPIO.HIGH);
 
+def display(value):
+    GPIO.output(latchPin,GPIO.LOW)
+    shiftOut(dataPin,clockPin,MSBFIRST,num[value])  # Send serial data to 74HC595
+    GPIO.output(latchPin,GPIO.HIGH)
+
 def loop():
     while True:
         for i in range(0,len(num)):
@@ -50,4 +55,3 @@ if __name__ == '__main__': # Program entrance
         loop()
     except KeyboardInterrupt:  # Press ctrl-c to end the program.
         destroy()
-

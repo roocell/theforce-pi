@@ -31,6 +31,11 @@ def shiftOut(dPin,cPin,order,val):
             GPIO.output(dPin,(0x80&(val<<i)==0x80) and GPIO.HIGH or GPIO.LOW)
         GPIO.output(cPin,GPIO.HIGH);
 
+def display(value):
+    GPIO.output(latchPin,GPIO.LOW)  # Output low level to latchPin
+    shiftOut(dataPin,clockPin,LSBFIRST,value) # Send serial data to 74HC595
+    GPIO.output(latchPin,GPIO.HIGH) # Output high level to latchPin, and 74HC595 will update the data to the parallel output port.
+
 def loop():
     while True:
         x=0x01
