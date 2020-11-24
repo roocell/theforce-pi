@@ -5,13 +5,40 @@ import time
 LSBFIRST = 1
 MSBFIRST = 2
 # define the pins for 74HC595
-dataPin   = 11     #GPIO17 # DS Pin of 74HC595(Pin14)
+dataPin   = 15     #GPIO22 # DS Pin of 74HC595(Pin14)
 latchPin  = 13     #GPIO27 # ST_CP Pin of 74HC595(Pin12)
-clockPin = 15      #GPIO22 # CH_CP Pin of 74HC595(Pin11)
+clockPin = 11      #GPIO17 # CH_CP Pin of 74HC595(Pin11)
 
 
 # SevenSegmentDisplay display the character "0"- "F" successively
-num = [0xc0,0xf9,0xa4,0xb0,0x99,0x92,0x82,0xf8,0x80,0x90,0x88,0x83,0xc6,0xa1,0x86,0x8e]
+# original
+#   A
+# F  G  B
+# E    C
+#   D      DP
+#num = [0xc0,0xf9,0xa4,0xb0,0x99,0x92,0x82,0xf8,0x80,0x90,0x88,0x83,0xc6,0xa1,0x86,0x8e]
+
+# messed up the wiring when soldering - so I have a new A-G map
+# 0xFF  ->  DP,G,F,E,D,C,B,A  MSB->LSB
+# bit on = light off
+#   F
+# A  B  G
+# E    C
+#   D      DP
+# '0' , '9'
+#0 = B off = 0x02
+#1 = ABDEF off = 0x3B
+#2 = AC off = 0x05
+#3 = AE off = 0x11
+#4 = DEF off = 0x38
+#5 = EG off = 0x50
+#6 = G off = 0x40
+#7 = ABDE off = 0x1B
+#8 = all on = 0x00
+#9 = ED off = 0x90
+DP = 0x80
+num = [0x02|DP,0x3B|DP,0x05|DP,0x11|DP, 0x38|DP, 0x50|DP, 0x40|DP, 0x1B|DP, 0x00|DP, 0x90|DP]
+
 def setup():
     GPIO.setmode(GPIO.BOARD)   # use PHYSICAL GPIO Numbering
     GPIO.setup(dataPin, GPIO.OUT)
@@ -31,6 +58,23 @@ def display(value):
     GPIO.output(latchPin,GPIO.LOW)
     shiftOut(dataPin,clockPin,MSBFIRST,num[value])  # Send serial data to 74HC595
     GPIO.output(latchPin,GPIO.HIGH)
+
+def off():
+    GPIO.output(latchPin,GPIO.LOW)
+    shiftOut(dataPin,clockPin,MSBFIRST,0xFF)
+    GPIO.output(latchPin,GPIO.HIGH)
+
+def test():
+    i = 0
+    while i < 8:
+        x = 0x01
+        x = x << i
+        print("x {}".format(x))
+        GPIO.output(latchPin,GPIO.LOW)
+        shiftOut(dataPin,clockPin,MSBFIRST,x)
+        GPIO.output(latchPin,GPIO.HIGH)
+        time.sleep(3)
+        i += 1
 
 def loop():
     while True:
@@ -52,6 +96,7 @@ if __name__ == '__main__': # Program entrance
     print ('Program is starting...' )
     setup()
     try:
-        loop()
+        #loop()
+        test()
     except KeyboardInterrupt:  # Press ctrl-c to end the program.
         destroy()

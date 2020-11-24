@@ -11,14 +11,14 @@ import time
 LSBFIRST = 1
 MSBFIRST = 2
 # define the pins for 74HC595
-dataPin   = 16   #GPIO23   # DS Pin of 74HC595(Pin14)
+dataPin   = 22   #GPIO25   # DS Pin of 74HC595(Pin14)
 latchPin  = 18   #GPIO24   # ST_CP Pin of 74HC595(Pin12)
-clockPin = 22    #GPIO25   # CH_CP Pin of 74HC595(Pin11)
+clockPin = 16    #GPIO23   # CH_CP Pin of 74HC595(Pin11)
 
 # the shift register only support 8 outputs
 # so we'll control the last 2 directly with raspi GPIO
-bar9Pin =  37 #GPIO25
-bar10Pin = 35 #GPIO19
+bar9Pin =  35 #GPIO19
+bar10Pin = 37 #GPIO25
 
 def setup():
     GPIO.setmode(GPIO.BOARD)    # use PHYSICAL GPIO Numbering
@@ -40,8 +40,8 @@ def shiftOut(dPin,cPin,order,val):
 
 def display(value):
     if value < 8:
-        x = 0x01
-        x = x << value
+        x = 0x80
+        x = x >> value
         GPIO.output(latchPin,GPIO.LOW)  # Output low level to latchPin
         shiftOut(dataPin,clockPin,LSBFIRST,x) # Send serial data to 74HC595
         GPIO.output(latchPin,GPIO.HIGH) # Output high level to latchPin, and 74HC595 will update the data to the parallel output port.

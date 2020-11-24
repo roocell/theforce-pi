@@ -44,6 +44,9 @@ def loop():
         print ("The distance is : %.2f cm"%(distance))
         time.sleep(1)
 
+def destroy():
+    GPIO.cleanup()
+
 if __name__ == '__main__':     # Program entrance
     print ('Program is starting...')
     setup()
