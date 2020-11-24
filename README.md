@@ -5,6 +5,8 @@ this project will use an ultrasonic sensor to detect hand movement, will control
 when the hand is at a particular distance it will start to count down a 7-segment display and at zero will release
 a trigger controlled via a servo motor.
 
-![alt text](breadboard.JPG)
-![alt text](1.JPG)
-![alt text](2.JPG)
+<p align="center">
+  <img src="breadboard.jpg" width="350" title="breadboard">
+  <img src="1.JPG" width="350" title="1">
+  <img src="2.JPG" width="350" title="2">
+</p>
